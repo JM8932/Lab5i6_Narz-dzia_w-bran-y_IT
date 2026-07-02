@@ -1,0 +1,43 @@
+name: Automatyczny Build EXE
+
+
+on:
+  push:
+    branches: [ "main", "master" ] 
+  schedule:
+    - cron: '0 12 * * 1' 
+  workflow_dispatch: 
+
+jobs:
+  build:
+   
+    runs-on: windows-latest
+
+    steps:
+    
+    - name: Pobranie kodu repozytorium
+      uses: actions/checkout@v3
+
+    
+    - name: Konfiguracja środowiska Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11' 
+
+    
+    - name: Instalacja wymaganych bibliotek
+      shell: pwsh
+      run: |
+        .\installResources.ps1
+
+    
+    - name: Budowanie pliku .exe za pomoca PyInstaller
+      run: |
+        pyinstaller --onefile --noconsole project.py
+
+    
+    - name: Przesłanie gotowego pliku .exe
+      uses: actions/upload-artifact@v3
+      with:
+        name: Skompilowany-Program-Konwerter
+        path: dist/project.exe
